@@ -2,6 +2,7 @@
 import streamlit as st
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
+import json
 import os
 
 # Page setup
@@ -11,8 +12,8 @@ st.set_page_config(
     layout="wide"
 )
 
-# Few shot examples
-few_shot_posts = [
+# Default few shot examples
+default_posts = [
     {
         "topic": "AI",
         "length": "Medium",
@@ -22,10 +23,6 @@ What I learned:
 → LLMs are powerful but need YOUR data to be truly useful
 → ChromaDB makes vector search surprisingly simple
 → Langchain connects everything beautifully
-
-The feeling when your chatbot answers questions from your own PDF correctly... priceless.
-
-If you're learning AI, start with RAG. It's the most practical skill you can build right now.
 
 #AI #MachineLearning #RAG #Langchain #Python"""
     },
@@ -38,34 +35,19 @@ If you're learning AI, start with RAG. It's the most practical skill you can bui
 2️⃣ Communication skills matter as much as technical skills
 3️⃣ Start with simple models before complex ones
 
-What would you add to this list?
-
 #DataScience #MachineLearning #CareerTips"""
     },
     {
         "topic": "Career",
         "length": "Long",
-        "post": """From zero to building AI applications in 3 months. Here's my honest journey.
-
-3 months ago I had no idea what an LLM was. Today I have deployed AI applications that solve real problems.
+        "post": """From zero to building AI applications in 3 months.
 
 What changed?
-
 ✅ I stopped watching tutorials and started building
 ✅ I focused on one project at a time
 ✅ I documented everything on GitHub
-✅ I asked questions when stuck instead of giving up
 
-The AI field is moving fast. But that's actually good news for learners. Companies need people who can BUILD with AI — not just talk about it.
-
-You don't need a PhD. You don't need 10 years of experience.
-You need consistency, curiosity and real projects.
-
-Start today. Build something. Put it on GitHub.
-
-That's it.
-
-#AI #CareerGrowth #MachineLearning #Python #NeverStopLearning"""
+#AI #CareerGrowth #MachineLearning #Python"""
     }
 ]
 
@@ -77,12 +59,14 @@ def get_length_text(length):
     else:
         return "7-10 lines"
 
-def generate_post(topic, tone, length, use_emoji, api_key):
+def generate_post(topic, tone, length, use_emoji, api_key, posts):
     llm = ChatGroq(model="llama-3.1-8b-instant", api_key=api_key)
     length_text = get_length_text(length)
+    
     examples = ""
-    for i, post in enumerate(few_shot_posts):
+    for i, post in enumerate(posts):
         examples += f"\nExample {i+1}:\n{post['post']}\n"
+    
     emoji_instruction = "Use relevant emojis." if use_emoji else "Do not use emojis."
 
     prompt = ChatPromptTemplate.from_template("""
@@ -131,10 +115,37 @@ st.markdown("---")
 
 # Sidebar
 st.sidebar.title("⚙️ Settings")
-st.sidebar.markdown("""
-### About
-This app uses **Few Shot Learning** to generate LinkedIn posts that match a professional writing style.
+groq_api_key = st.sidebar.text_input(
+    "🔑 Enter Groq API Key",
+    type="password",
+    help="Get your free key at console.groq.com"
+)
 
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 📂 Upload Your Posts (Optional)")
+st.sidebar.markdown("Upload your own LinkedIn posts in JSON format to match your personal style.")
+
+uploaded_json = st.sidebar.file_uploader(
+    "Upload JSON file",
+    type="json",
+    help="Upload a JSON file with your own LinkedIn posts"
+)
+
+# Download sample JSON button
+with open("sample_posts.json", "w") as f:
+    json.dump(default_posts, f, indent=2)
+
+with open("sample_posts.json", "rb") as f:
+    st.sidebar.download_button(
+        label="📥 Download Sample JSON",
+        data=f,
+        file_name="sample_posts.json",
+        mime="application/json"
+    )
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### About")
+st.sidebar.markdown("""
 **Tech Stack:**
 - 🦙 LLaMA 3.1 (Groq)
 - 🔗 Langchain
@@ -142,13 +153,15 @@ This app uses **Few Shot Learning** to generate LinkedIn posts that match a prof
 - 🎨 Streamlit
 """)
 st.sidebar.markdown("---")
-groq_api_key = st.sidebar.text_input(
-    "🔑 Enter Groq API Key",
-    type="password",
-    help="Get your free key at console.groq.com"
-)
-st.sidebar.markdown("---")
 st.sidebar.markdown("👨‍💻 [GitHub Profile](https://github.com/Murtaza-data)")
+
+# Load posts
+if uploaded_json:
+    posts = json.load(uploaded_json)
+    st.success(f"✅ Loaded {len(posts)} posts from your file. Generating in your personal style!")
+else:
+    posts = default_posts
+    st.info("💡 Using default example posts. Upload your own JSON for personalized style.")
 
 # Main inputs
 st.markdown("### ✍️ Post Details")
@@ -182,7 +195,7 @@ if generate_btn:
         st.warning("⚠️ Please enter a topic for your post.")
     else:
         with st.spinner("✨ Generating your LinkedIn posts..."):
-            result = generate_post(topic, tone, length, use_emoji, groq_api_key)
+            result = generate_post(topic, tone, length, use_emoji, groq_api_key, posts)
             variations = result.split("---")
 
         st.markdown("### 📝 Your Generated Posts")

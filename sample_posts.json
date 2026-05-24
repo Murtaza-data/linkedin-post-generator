@@ -1,0 +1,20 @@
+[
+  {
+    "topic": "AI",
+    "length": "Medium",
+    "language": "English",
+    "post": "Just completed building my first RAG application! \ud83d\ude80\n\nWhat I learned:\n\u2192 LLMs are powerful but need YOUR data to be truly useful\n\u2192 ChromaDB makes vector search surprisingly simple\n\u2192 Langchain connects everything beautifully\n\n#AI #MachineLearning #RAG"
+  },
+  {
+    "topic": "Data Science",
+    "length": "Short",
+    "language": "English",
+    "post": "3 things I wish I knew before starting Data Science:\n\n1\ufe0f\u20e3 Clean data beats fancy models every time\n2\ufe0f\u20e3 Communication skills matter as much as technical skills\n3\ufe0f\u20e3 Start with simple models before complex ones\n\n#DataScience #MachineLearning"
+  },
+  {
+    "topic": "Career",
+    "length": "Long",
+    "language": "English",
+    "post": "From zero to building AI applications in 3 months.\n\nWhat changed?\n\u2705 I stopped watching tutorials and started building\n\u2705 I focused on one project at a time\n\u2705 I documented everything on GitHub\n\n#AI #CareerGrowth #MachineLearning"
+  }
+]
