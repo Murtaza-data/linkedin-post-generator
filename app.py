@@ -36,7 +36,7 @@ What changed?
 ]
 
 def extract_style(posts, api_key):
-    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=api_key)
+    llm = ChatGroq(model="llama-3.3-70b-versatile", api_key=api_key)
     posts_text = "\n---\n".join(posts)
     prompt = ChatPromptTemplate.from_template("""
 Analyze these LinkedIn posts and extract the writing style profile:
